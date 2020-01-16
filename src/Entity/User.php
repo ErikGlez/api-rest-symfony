@@ -12,7 +12,7 @@ use Doctrine\Common\Collections\Collection;
  * @ORM\Table(name="users")
  * @ORM\Entity
  */
-class User
+class User implements \JsonSerializable
 {
     /**
      * @var int
@@ -156,6 +156,15 @@ class User
      */
     public function getVideos(): Collection{
         return $this->videos;
+    }
+
+    public function jsonSerialize(): array{
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'surname' => $this->surname,
+            'email' => $this->email
+        ];
     }
 
 
