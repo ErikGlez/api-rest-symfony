@@ -180,4 +180,42 @@ class UserController extends AbstractController
         return $this->resjson($data);
     }
 
+    public  function edit(Request $request, JwtAuth $jwt_auth){
+
+        // Recoger la cabecera de autenticación
+        $token = $request->headers->get('Authorization');
+        // Crear metodo para comprobar si el token es correcto
+        $authCheck = $jwt_auth->checkToken($token);
+        // Si es correcto, hacer la actualización del usuario
+        if($authCheck){
+            // Actualizar el usuario
+
+            // Conseguir el entity manager
+
+            // Conseguir los datos del usuario identificado
+
+            // conseguir el usuario a actualizar completo
+
+            // recoger datos por post
+
+            //comprobar y validar los datos
+
+            // asignar nuevos datos al objeto del usuario
+
+            // comprobar duplicados
+
+            // guardar cambios en bd
+        }
+        //..
+
+        $data = [
+            'status' => 'error',
+            'message' => 'Metodo update',
+            'token' => $token,
+            'authCheck'=> $authCheck
+        ];
+
+        return $this->resjson($data);
+    }
+
 }
