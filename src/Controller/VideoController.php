@@ -225,5 +225,45 @@ class VideoController extends AbstractController
         return $this->resjson($data);
     }
 
+    public function remove(Request $request, JwtAuth $jwt_auth, $id = null){
+        
+        // Recoger el token
+        $token = $request->headers->get('Authorization');
+        $authCheck = $jwt_auth->checkToken($token);
+
+        // Respuesta por defecto 
+        $data = [
+            'status' => 'error',
+            'code' => 400,
+            'message' => 'No fue posible eliminar el video.'
+            
+        ];
+
+        if($authCheck){
+            $identity = $jwt_auth->checkToken($token, true);
+
+            $doctrine = $this->getDoctrine();
+            $em = $doctrine->getManager();
+            $video = $doctrine->getRepository(Video::class)->findOneBy([
+                'id' => $id
+            ]);
+
+            if($video && is_object($video) && $identity->sub == $video->getUser()->getId()){
+                $em->remove($video);
+                $em->flush();
+
+                $data = [
+                    'status' => 'success',
+                    'code' => 200,
+                    'message' => 'Video eliminado con exito.',
+                    'video' => $video
+                    
+                ];
+            }
+        }
+        // Devolver una respuesta
+        return $this->resjson($data);
+    }
+
 
 }
