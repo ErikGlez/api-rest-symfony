@@ -46,7 +46,7 @@ class VideoController extends AbstractController
         ]);
     }
 
-    public function create(Request $request, JwtAuth $jwt_auth){
+    public function create(Request $request, JwtAuth $jwt_auth, $id = null){
 
         // Respuesta por defecto
         $data = [
@@ -89,31 +89,59 @@ class VideoController extends AbstractController
                         'id' => $user_id
                     ]);
 
-                    // Crear y guardar objeto
-                    $video = new Video();
-                    $video->setUser($user);
-                    $video->setTitle($title);
-                    $video->setDescription($description);
-                    $video->setUrl($url);
-                    $video->setStatus('ver luego');
 
-                    $createdAt = new \Datetime('now');
-                    $updatedAt = new \Datetime('now');
+                    if($id == null ){ // Guardar video
+                        // Crear y guardar objeto
+                        $video = new Video();
+                        $video->setUser($user);
+                        $video->setTitle($title);
+                        $video->setDescription($description);
+                        $video->setUrl($url);
+                        $video->setStatus('ver luego');
 
-                    $video->setCreatedAt($createdAt);
-                    $video->setUpdatedAt($updatedAt);
+                        $createdAt = new \Datetime('now');
+                        $updatedAt = new \Datetime('now');
 
-                    // Guardar bd
-                    $em->persist($video);
-                    $em->flush();
+                        $video->setCreatedAt($createdAt);
+                        $video->setUpdatedAt($updatedAt);
 
-                    // Respuesta 
-                    $data = [
-                        'status' => 'success',
-                        'code' => 200,
-                        'message' => 'El video se ha guardado correctamente.',
-                        'video' => $video
-                    ];
+                        // Guardar bd
+                        $em->persist($video);
+                        $em->flush();
+
+                        // Respuesta 
+                        $data = [
+                            'status' => 'success',
+                            'code' => 200,
+                            'message' => 'El video se ha guardado correctamente.',
+                            'video' => $video
+                        ];
+                    }else{ // Actualizar video
+
+                        $video =  $this->getDoctrine()->getRepository(Video::class)->findOneBy([
+                            'id' => $id,
+                            'user' => $identity->sub
+                        ]);
+
+                        if($video && is_object($video)){
+                            $video->setTitle($title);
+                            $video->setDescription($description);
+                            $video->setUrl($url);
+                        
+                            $updatedAt = new \Datetime('now');
+                            $video->setUpdatedAt($updatedAt);
+
+                            $em->persist($video);
+                            $em->flush();
+
+                            $data = [
+                                'status' => 'success',
+                                'code' => 200,
+                                'message' => 'El video actualizado correctamente.',
+                                'video' => $video
+                            ];
+                        }
+                    }
 
                 }   
  
